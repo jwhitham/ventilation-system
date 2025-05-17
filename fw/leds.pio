@@ -1,0 +1,52 @@
+;
+; 
+; Copyright (c) 2025 Jack Whitham
+; 
+; SPDX-License-Identifier: BSD-3-Clause
+; 
+; PIO program for LED driver
+;
+; Brightness of LEDs is controlled by the length of the ON state.
+; Some LEDs appear brighter than others (resistors are shared)
+; so the timing is:
+; Yellow - 20 clock cycles
+; Red - 1 clock cycle
+; Green - 5 clock cycles
+; The OFF time is a gap of 10 clock cycles
+
+.program leds
+    set pindirs, 0              ; Pins become inputs
+get_new_input:
+    pull noblock                ; Get new output into OSR if available, otherwise mov osr, x
+    mov x, osr                  ; Save the new output in register x before shifting
+led_1:
+    ; #define MIDDLE_RIGHT_LED    0       // yellow
+    out pins, 3                 ; Set output for LED - pins: 001 dirs: 011
+    set pindirs, 3  [19]        ; Enable output for LED and wait in ON state
+    set pindirs, 0  [8]         ; Disable output for LED and wait in OFF state
+led_2:
+    ; #define MIDDLE_LEFT_LED     1       // red
+    out pins, 3                 ; Set output for LED - pins: 010 dirs: 011
+    set pindirs, 3  [0]         ; Enable output for LED and wait in ON state
+    set pindirs, 0  [8]         ; Disable output for LED and wait in OFF state
+led_3:
+    ; #define MIDDLE_UPPER_LED    2       // green
+    out pins, 3                 ; Set output for LED - pins: 001 dirs: 101
+    set pindirs, 5  [4]         ; Enable output for LED and wait in ON state
+    set pindirs, 0  [8]         ; Disable output for LED and wait in OFF state
+led_4:
+    ; #define TOP_LED             3       // green
+    out pins, 3                 ; Set output for LED - pins: 100 dirs: 101
+    set pindirs, 5  [4]         ; Enable output for LED and wait in ON state
+    set pindirs, 0  [8]         ; Disable output for LED and wait in OFF state
+led_5:
+    ; #define LOWER_LEFT_LED      4       // red
+    out pins, 3                 ; Set output for LED - pins: 010 dirs: 110
+    set pindirs, 6  [0]         ; Enable output for LED and wait in ON state
+    set pindirs, 0  [8]         ; Disable output for LED and wait in OFF state
+led_6:
+    ; #define LOWER_RIGHT_LED     5       // yellow
+    out pins, 3                 ; Set output for LED - pins: 100 dirs: 110
+    set pindirs, 6  [19]        ; Enable output for LED and wait in ON state
+    set pindirs, 0  [5]         ; Disable output for LED and wait in OFF state
+    jmp get_new_input

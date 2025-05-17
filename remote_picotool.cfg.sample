@@ -1,0 +1,11 @@
+# A remote_picotool.cfg file in the root of the Git repository will
+# provide settings for remote_picotool so that the --secret and --id
+# prameters are not required. The following are just sample values
+# for a hypothetical Pico 2 W device.
+
+# unique board ID as reported by "remote_picotool list" and "picotool -a"
+board_id=7D47CF75B7A48BD7
+
+# Shared secret for remote updates (matches wifi-settings file)
+update_secret=hunter2
+

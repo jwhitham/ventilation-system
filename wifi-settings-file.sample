@@ -1,0 +1,38 @@
+# The wifi-settings file is stored in the Pico 2 W at Flash address 0x103fc000
+# and provides the WiFi hotspot names and passwords along with any other
+# configuration that may be needed for the firmware. In this case the file is
+# used to set the hot/cold temperature thresholds for the ventilation system,
+# and the address of a server to receive status reports.
+
+# Network settings
+ssid1=MyHomeWiFi
+pass1=mypassword1234
+ssid2=MyPhoneHotspot
+pass2=secretpassword
+name=ventilation-system
+country=GB
+
+# Shared secret for remote updates with remote_picotool (matches remote_picotool.cfg)
+update_secret=hunter2
+
+# Temperature thresholds (Celsius)
+cold_threshold=3.0
+not_cold_threshold=4.0
+not_hot_threshold=34.0
+hot_threshold=35.0
+
+# minimum time between change of activity (2 minutes)
+change_delay_s=120
+
+# where to send report messages
+report_address=192.168.0.99
+report_port=1111
+
+# how frequently to send report messages
+report_interval_s=60
+
+# where to listen for commands
+control_port=1112
+
+# timeout for manual settings (8 hours)
+manual_timeout_s=28800

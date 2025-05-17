@@ -1,0 +1,12 @@
+build
+dist
+*.aab
+*.apk
+*.apks
+*.bin
+config.json
+running-range-gps-config.json
+venv
+p4a-storage
+__pycache__
+remote_picotool.cfg

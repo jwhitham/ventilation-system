@@ -1,0 +1,3 @@
+[submodule "wifi_settings"]
+	path = wifi_settings
+	url = https://github.com/jwhitham/pico-wifi-settings
