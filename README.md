@@ -104,6 +104,26 @@ before writing much of the firmware, which is arguably still unfinished! The fir
 version did not use the thermistor correctly and just allowed some limited
 manual control.
 
+# Software build and deploy 
+
+You'll need the [Pico SDK](https://github.com/raspberrypi/pico-sdk/) to build.
+
+- use `setup.sh` to run the CMake configuration step
+- use `build.sh` to build
+
+In my working copy, I have two additional files in the repository root:
+`wifi-settings-file` and `remote_picotool.cfg`. These are based on the sample
+files `wifi-settings-file.sample` and `remote_picotool.cfg.sample` but I have
+added my own WiFi details and shared secret. These allow me to use the following
+commands:
+
+- `./remote_picotool.py update_reboot wifi-settings-file` to upload
+  the wifi-settings-file to the Pico: for example, to add a new WiFi hotspot
+  or change one of the temperature thresholds.
+- `./remote_picotool.py ota build/fw/main.uf2` to upload new firmware to the Pico.
+- `python remote_status.py` to get a status report containing the temperature and
+  internal status of the ventilation controller.
+
 # Costs
 
 As I was able to use parts that I already had, I am unsure of the exact cost of the
