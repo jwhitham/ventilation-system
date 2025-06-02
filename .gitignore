@@ -10,3 +10,4 @@ venv
 p4a-storage
 __pycache__
 remote_picotool.cfg
+wifi-settings-file
