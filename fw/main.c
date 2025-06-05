@@ -314,6 +314,10 @@ static int32_t remote_handler_get_status(
             }
             memcpy(data_buffer, cs, (size_t) *output_data_size);
             break;
+        case 2:
+            // Temperature report dump
+            *output_data_size = temperature_copy(cs->temperature_handle, data_buffer, *output_data_size);
+            break;
         default:
             *output_data_size = 0;
             break;

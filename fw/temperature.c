@@ -16,6 +16,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "hardware/gpio.h"
 #include "hardware/adc.h"
@@ -23,6 +24,7 @@
 #define ADC_FULL_SCALE      (1 << 12)
 #define HISTORY_SIZE        100     // Temperatures averaged over 100 samples
 #define ADC_REF_VOLTAGE     3.3f
+#define MAX_REPORT_SIZE     2000
 
 typedef struct sensor_history_t {
     int         index;
@@ -33,6 +35,8 @@ typedef struct sensor_history_t {
 typedef struct temperature_t {
     sensor_history_t    internal_sensor_history;
     sensor_history_t    external_sensor_history;
+    int16_t             report_data[MAX_REPORT_SIZE];
+    uint32_t            report_index;
 } temperature_t;
 
 
@@ -50,7 +54,13 @@ void temperature_update(struct temperature_t* t) {
     adc_select_input(4);
     update_history(&t->internal_sensor_history, adc_read());
     adc_select_input(2);
-    update_history(&t->external_sensor_history, adc_read());
+    const int16_t a = adc_read();
+    update_history(&t->external_sensor_history, a);
+    if (t->report_index >= MAX_REPORT_SIZE) {
+        t->report_index = 0;
+    }
+    t->report_data[t->report_index] = a;
+    t->report_index++;
 }
 
 struct temperature_t* temperature_init() {
@@ -96,4 +106,14 @@ float temperature_external(const struct temperature_t* t) {
     const float Rref = 15.0e3f;
     const float ratio = logf(r1 / Rref);
     return (1.0f / (A + (B * ratio))) - CtoK;
+}
+
+uint32_t temperature_copy(struct temperature_t* t, void* payload, uint32_t max_size) {
+    uint32_t size = t->report_index * 2;
+    if (size > max_size) {
+        size = max_size;
+    }
+    memcpy(payload, t->report_data, size);
+    t->report_index = 0;
+    return size;
 }
