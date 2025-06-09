@@ -143,17 +143,22 @@ sort of thermistor I used here, but I had to find the "beta" value by experiment
 comparing with values from a thermistor of known type.
 
 The ADC input to the Pico 2 W seems to pick up a lot of noise, and I'm not sure why - there is
-always some noise in analogue measurements but the error is much greater than I'd expect (+/- 5°C)
-and I wasn't able to reproduce the same problem on a different Pico 2 W. I suspect
-it is caused by power supply noise, but I have not confirmed this. To deal with the problem,
+always some noise in analogue measurements but the error is much greater than I'd expect (+/- 5°C).
+I suspect it is caused by power supply noise, but I have not confirmed this. To deal with the problem,
 I added code to average the input across a lot of samples. After a few problems with the firmware
 spuriously detecting a "hot" or "cold" condition due to +/- 5°C variations in the temperature
 reading, I changed the firmware to [store 100 samples
 and calculate the mean](fw/temperature.c), making the temperature data quite smooth.
 The following graph shows the difference between the raw samples and the mean across
-a 24 hour time period (2025-06-04):
+a 24 hour time period:
 
-![Temperature graph](img/graph.png)
+![Temperature graph from ventilation system, 2025-06-04](img/graph.png)
+
+I tried a similar experiment on another Pico 2 W with a different power supply,
+and found there was still some noise,
+less significant (+/- 1°C), but still large enough to justify averaging many samples:
+
+![Temperature graph recorded on another Pico 2 W, different location, 2025-06-06](img/graph3.png)
 
 It's not exactly related to this project, but as a general note, a PIV unit will make a lot of noise
 if directly mounted on the ceiling joists in a free-standing configuration.
