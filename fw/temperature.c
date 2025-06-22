@@ -95,13 +95,21 @@ float temperature_internal(const struct temperature_t* t) {
 float temperature_external(const struct temperature_t* t) {
     // sample value in 0.0 .. 1.0 range
     const float fraction = (float) t->external_sensor_history.total / (float) (ADC_FULL_SCALE * HISTORY_SIZE);
+    const float CtoK = 273.15f;  // return value will be in Celsius
+    // Range check
+    if (fraction < 0.015f) {
+        // very hot
+        return 1000.0f;
+    } else if (fraction > 0.985f) {
+        // very cold
+        return -CtoK;
+    }
     // calculate resistance of thermistor (there is a voltage divider with a fixed 15k resistance)
     const float r2 = 15000.0f;
     const float r1 = r2 / ((1.0f / fraction) - 1.0f);
     // Apply a simplified version of the Steinhart-Hart equation with C = 0
     // The thermistor type is not known and I have no official data on it, but I got the approximate B value experimentally
-    const float CtoK = 273.15f;  // return value will be in Celsius
-    const float A = 1.0 / (CtoK + 25.0);
+    const float A = 1.0f / (CtoK + 25.0f);
     const float B = 0.000305267f;
     const float Rref = 15.0e3f;
     const float ratio = logf(r1 / Rref);

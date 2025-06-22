@@ -48,6 +48,7 @@ typedef enum {
 
 typedef enum {
     MODE_AUTO = 0,      // Automatic
+    MODE_AUTO_DARK,     // Automatic, evening, increase power after dark
     MODE_MANUAL_OFF,    // manually set to off
     MODE_MANUAL_ON,     // manually set to on
     MODE_MANUAL_BOOST,  // manually set to boost
@@ -87,6 +88,16 @@ typedef struct control_status_t {
     struct udp_pcb*             comms_pcb;
 } control_status_t;
 
+static bool is_manual_mode(manual_mode_t mode) {
+    switch (mode) {
+        case MODE_AUTO:
+        case MODE_AUTO_DARK:
+            return false;
+        default:
+            return true;
+    }
+}
+
 static void make_report(control_status_t* cs, char* message, size_t size) {
     const char* control_text = "OFF";
     switch (cs->current_control_mode) {
@@ -120,7 +131,7 @@ static void make_report(control_status_t* cs, char* message, size_t size) {
         (double) cs->external_temperature_value,
         (double) internal_temperature_value,
         control_text,
-        (cs->manual_mode == MODE_AUTO) ? 1 : 0,
+        is_manual_mode(cs->manual_mode) ? 0 : 1,
         temp_text,
         (unsigned) uptime);
 }
@@ -176,7 +187,7 @@ static void periodic_task(control_status_t* cs) {
     }
 
     // Leave manual mode if the timeout is reached
-    if ((cs->manual_mode != MODE_AUTO)
+    if (is_manual_mode(cs->manual_mode)
     && time_reached(cs->manual_mode_end_time)) {
         cs->manual_mode = MODE_AUTO;
     }
@@ -186,6 +197,13 @@ static void periodic_task(control_status_t* cs) {
         case MODE_AUTO:
             if (cs->temperature_band == TEMP_MILD) {
                 cs->next_control_mode = CONTROL_ON;
+            } else {
+                cs->next_control_mode = CONTROL_OFF;
+            }
+            break;
+        case MODE_AUTO_DARK:
+            if (cs->temperature_band == TEMP_MILD) {
+                cs->next_control_mode = CONTROL_BOOST;
             } else {
                 cs->next_control_mode = CONTROL_OFF;
             }
@@ -248,7 +266,7 @@ static void periodic_task(control_status_t* cs) {
 
     // Temperature input LEDs (yellow)
     // Steady in auto mode, flashing in manual mode
-    if (cs->manual_mode == MODE_AUTO) {
+    if (!is_manual_mode(cs->manual_mode)) {
         switch (cs->temperature_band) {
             case TEMP_COLD:
                 leds |= COLD_LED_BIT;
@@ -331,6 +349,9 @@ static bool manual_setting(control_status_t* cs, const char* command, size_t siz
     bool ok = false;
     if (strncmp(command, "piv auto", size) == 0) {
         cs->manual_mode = MODE_AUTO;
+        ok = true;
+    } else if (strncmp(command, "piv dark", size) == 0) {
+        cs->manual_mode = MODE_AUTO_DARK;
         ok = true;
     } else if (strncmp(command, "piv on", size) == 0) {
         cs->manual_mode = MODE_MANUAL_ON;
