@@ -48,9 +48,10 @@ energy, and uses only 10% of the available memory.
 The Pico 2 W is a low-cost device. It connects to WiFi, which provides the remote control
 features that I wanted, and it connects easily to simple electronics such as LEDs,
 transistors and thermistors, which allow it to control other devices and react to changes
-in the environment. I reused a box from a previous generation of home automation,
+in the environment. I [reused a box from a previous generation of home automation,
 a heating controller that had once used an original Raspberry Pi model A, and I reused
-the LEDs and relays from that device too.
+the LEDs and relays from that device
+too](https://www.jwhitham.org/2013/03/review-using-raspberry-pi-for-home.html).
 
 The box:
 
